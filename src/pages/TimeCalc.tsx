@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
+import TabMenu from '../components/TabMenu'
 
 interface FormValues {
   baseHour: string
@@ -209,6 +210,7 @@ export default function TimeCalc() {
 
   return (
     <div>
+      <TabMenu />
       {mode === 'none' && (
         <form className="space-y-6">
           {/* 기준 시간 입력 + “지금 시간 넣기” 버튼 */}
