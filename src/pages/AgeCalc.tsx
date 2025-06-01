@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import TabMenu from '../components/TabMenu'
 
 dayjs.extend(customParseFormat)
 dayjs.locale('ko')
@@ -165,6 +166,7 @@ export default function AgeCalc() {
 
   return (
     <div>
+      <TabMenu />
       {mode === 'none' && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex justify-center space-x-4 items-center">

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 import ToggleSwitch from '../components/ToggleSwitch'
+import TabMenu from '../components/TabMenu'
 
 dayjs.locale('ko')
 
@@ -102,6 +103,7 @@ export default function DDayCalc() {
 
   return (
     <div>
+      <TabMenu />
       {mode === 'none' && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* 토글 선택 안내 */}

@@ -29,7 +29,8 @@ interface DifferenceResult {
 }
 
 export default function DateDiff() {
-  const { register, handleSubmit, reset, formState } = useForm<FormValues>({
+  // setValue을 추가로 가져옵니다.
+  const { register, handleSubmit, reset, setValue, formState } = useForm<FormValues>({
     mode: 'onSubmit',
   })
   const { errors } = formState
@@ -91,13 +92,32 @@ export default function DateDiff() {
     setResult(null)
   }
 
+  // “오늘 날짜 넣기” 버튼 클릭 핸들러
+  const handleFillToday = () => {
+    const today = dayjs()
+    setValue('startYear', today.format('YYYY'))
+    setValue('startMonth', today.format('MM'))
+    setValue('startDay', today.format('DD'))
+  }
+
   return (
     <div>
       <TabMenu />
-      {/** 결과가 없으면 입력 폼을 보여주고, 결과가 있으면 결과 화면을 보여줍니다 */}
+      {/** 결과가 없으면 입력 폼을 보여주고, 결과가 있으면 결과 화면을 보여줍니다 **/}
       {result === null ? (
         // 입력 폼 영역
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="flex justify-center">
+            {/* 오늘 날짜를 시작 날짜 입력란에 채워주는 버튼 */}
+            <button
+              type="button"
+              onClick={handleFillToday}
+              className="mb-4 px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white rounded-md text-sm font-medium transition-colors"
+            >
+              오늘 날짜 넣기
+            </button>
+          </div>
+
           <div className="flex justify-center space-x-4">
             {/* 첫 번째 날짜 입력: 연-월-일 */}
             <div className="flex items-center space-x-1">

@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 export default function TabMenu() {
   // 나중에 라우트 추가/삭제가 편하기 위해 배열로 정의함
   const tabs = [
+    { label: '홈', to: '/' },
     { label: '날짜 차이 계산기', to: '/date-diff' },
     { label: '시간 계산기',       to: '/time-calc' },
     { label: '나이 차이 계산기', to: '/age-diff' },
