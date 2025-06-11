@@ -1,15 +1,16 @@
 // src/App.tsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Layout from './components/layout'
+import Layout from './components/Layout'
 import Home from './pages/Home'
 import DateDiff from './pages/DateDiff'
 import TimeCalc from './pages/TimeCalc'
 import AgeDiff from './pages/AgeDiff'
 import AgeCalc from './pages/AgeCalc'
-import DDayCalc from './pages/DdayCalc'
+import DDayCalc from './pages/DDayCalc'
 
 export default function App() {
   return (
+    <div>
     <BrowserRouter>
       {/* Layout: 헤더 + 메인 컨테이너를 정의 */}
       <Layout>
@@ -29,5 +30,6 @@ export default function App() {
         </Routes>
       </Layout>
     </BrowserRouter>
+    </div>
   )
 }
