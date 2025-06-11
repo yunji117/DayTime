@@ -11,7 +11,7 @@ import DDayCalc from './pages/DDayCalc'
 export default function App() {
   return (
     <div>
-    <BrowserRouter>
+    <BrowserRouter basename="/DayTime">
       {/* Layout: 헤더 + 메인 컨테이너를 정의 */}
       <Layout>
         <Routes>
