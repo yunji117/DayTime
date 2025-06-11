@@ -34,44 +34,62 @@ interface AgeResult {
   totalSeconds: number
 }
 
+// react-hook-form으로 폼 상태 관리
 export default function AgeDiff() {
   const { register, handleSubmit, reset, formState } = useForm<FormValues>({ mode: 'onSubmit' })
   const { errors } = formState
+  // 화면 모드(입력/결과)와 계산 결과 저장
   const [mode, setMode] = useState<Mode>('none')
   const [result, setResult] = useState<AgeResult | null>(null)
   const navigate = useNavigate()
 
+  // 날짜를 보기 좋게 포맷(YYYY년 MM월 DD일 ...)
   const formatWithDay = (d: dayjs.Dayjs): string => d.format('YYYY년 MM월 DD일 HH시 mm분 ss초(ddd)')
+  // 빈칸 입력은 0으로 변환
   const toNumberOrZero = (str: string): number => { const n = parseInt(str, 10); return isNaN(n) ? 0 : n }
-
+  // "다시하기" - 폼 및 결과 초기화
   const handleReset = () => { reset(); setResult(null); setMode('none') }
 
+  // 폼 제출 시 두 날짜의 차이 계산
   const onSubmit = (data: FormValues) => {
+    // 첫 번째 사람 생년월일/시간 파싱
     const y1 = parseInt(data.year1 || '', 10)
     const mo1 = parseInt(data.month1 || '', 10)
     const d1 = parseInt(data.day1 || '', 10)
+    // 두 번째 사람 생년월일/시간 파싱
     const y2 = parseInt(data.year2 || '', 10)
     const mo2 = parseInt(data.month2 || '', 10)
     const d2 = parseInt(data.day2 || '', 10)
+    // 필수값(년월일) 미입력 시 알림
     if (isNaN(y1) || isNaN(mo1) || isNaN(d1)) { alert('첫 번째 사람의 생년월일(년·월·일)을 정확히 입력해주세요.'); return }
     if (isNaN(y2) || isNaN(mo2) || isNaN(d2)) { alert('두 번째 사람의 생년월일(년·월·일)을 정확히 입력해주세요.'); return }
+    // 시/분/초 값 파싱 (빈칸 0)
     const h1 = toNumberOrZero(data.hour1)
     const mi1 = toNumberOrZero(data.minute1)
     const s1 = toNumberOrZero(data.second1)
     const h2 = toNumberOrZero(data.hour2)
     const mi2 = toNumberOrZero(data.minute2)
     const s2 = toNumberOrZero(data.second2)
+    // 날짜/시간 범위 체크
     const validRange =
       mo1 >= 1 && mo1 <= 12 && d1 >= 1 && d1 <= 31 && h1 >= 0 && h1 <= 23 && mi1 >= 0 && mi1 <= 59 && s1 >= 0 && s1 <= 59 &&
       mo2 >= 1 && mo2 <= 12 && d2 >= 1 && d2 <= 31 && h2 >= 0 && h2 <= 23 && mi2 >= 0 && mi2 <= 59 && s2 >= 0 && s2 <= 59
     if (!validRange) { alert('날짜(월:1~12, 일:1~31) 및 시간(시:0~23, 분/초:0~59)을 확인해주세요.'); return }
+    
+    // 입력값을 dayjs 객체로 변환
     const str1 = `${String(y1).padStart(4, '0')}-${String(mo1).padStart(2, '0')}-${String(d1).padStart(2, '0')} ${String(h1).padStart(2, '0')}:${String(mi1).padStart(2, '0')}:${String(s1).padStart(2, '0')}`
     const str2 = `${String(y2).padStart(4, '0')}-${String(mo2).padStart(2, '0')}-${String(d2).padStart(2, '0')} ${String(h2).padStart(2, '0')}:${String(mi2).padStart(2, '0')}:${String(s2).padStart(2, '0')}`
     const dt1 = dayjs(str1, 'YYYY-MM-DD HH:mm:ss')
     const dt2 = dayjs(str2, 'YYYY-MM-DD HH:mm:ss')
+    
+    // 유효하지 않은 날짜/시간 입력 시 알림
     if (!dt1.isValid() || !dt2.isValid()) { alert('날짜/시간 형식이 올바르지 않습니다.'); return }
+    
+    // 두 날짜 중 더 빠른 것을 dtA, 늦은 것을 dtB로 정렬
     let dtA = dt1, dtB = dt2
     if (dt1.isAfter(dt2)) { dtA = dt2; dtB = dt1 }
+    
+    // 년,월,일,시,분,초 단위별 차이 계산
     const years = dtB.diff(dtA, 'year')
     const afterYear = dtA.add(years, 'year')
     const months = dtB.diff(afterYear, 'month')
@@ -83,12 +101,18 @@ export default function AgeDiff() {
     const minutes = dtB.diff(afterHour, 'minute')
     const afterMinute = afterHour.add(minutes, 'minute')
     const seconds = dtB.diff(afterMinute, 'second')
+
+    // 총 일/시간/분/초 단위 차이 계산
     const totalSec = Math.abs(dtB.diff(dtA, 'second'))
     const totalMin = Math.floor(totalSec / 60)
     const totalHr = Math.floor(totalMin / 60)
     const totalDay = Math.floor(totalHr / 24)
+
+    // 입력 날짜 보기 좋게 포맷
     const formatted1 = formatWithDay(dtA)
     const formatted2 = formatWithDay(dtB)
+
+    // 계산 결과 저장 및 결과 모드로 전환
     setResult({
       formatted1, formatted2,
       yearDiff: years, monthDiff: months, dayDiff: days,
@@ -99,6 +123,7 @@ export default function AgeDiff() {
     setMode('result')
   }
 
+  // 입력 필드 그룹 컴포넌트 (년/월/일, 시/분/초)
   const InputGroup = ({
     prefix,
   }: { prefix: '1' | '2' }) => (
@@ -201,12 +226,14 @@ export default function AgeDiff() {
           <form className="space-y-8">
             {/* 1) 첫 번째 사람 */}
             <div className="flex flex-row items-start space-x-2">
-              <span role="img" aria-label="person" className="mt-2">👤</span>
+              {/* <span role="img" aria-label="person" className="mt-2">👤</span> */}
+              <b className='whitespace-nowrap'>사람1</b>
               <InputGroup prefix="1" />
             </div>
             {/* 2) 두 번째 사람 */}
             <div className="flex flex-row items-start space-x-2">
-              <span role="img" aria-label="person" className="mt-2">👤</span>
+              {/* <span role="img" aria-label="person" className="mt-2">👤</span> */}
+              <b className='whitespace-nowrap'>사람2</b>
               <InputGroup prefix="2" />
             </div>
             {/* 유효성 검사 오류 메시지 */}

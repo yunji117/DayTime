@@ -32,6 +32,7 @@ export default function AgeCalc() {
   const { register, handleSubmit, reset, formState } = useForm<FormValues>({ mode: 'onSubmit' })
   const { errors } = formState
 
+  // 현재 화면 모드(입력/결과)와 결과 값 상태 관리
   const [mode, setMode] = useState<Mode>('none')
   const [result, setResult] = useState<AgeResult | null>(null)
   const navigate = useNavigate()
@@ -41,12 +42,13 @@ export default function AgeCalc() {
     return d.format('YYYY년 MM월 DD일 HH시 mm분 ss초(ddd)')
   }
 
+  // 입력값이 빈칸이면 0으로 변환
   const toNumberOrZero = (str: string): number => {
     const n = parseInt(str, 10)
     return isNaN(n) ? 0 : n
   }
 
-  // 띠 계산
+  // 출생 띠(12간지) 계산 (입춘 기준)
   const getZodiac = (year: number, month: number, day: number): string => {
     const ipchun = dayjs(`${year}-02-04`, 'YYYY-MM-DD')
     const birthday = dayjs(
@@ -62,16 +64,22 @@ export default function AgeCalc() {
 
   // “올해 내 나이는?” 제출 처리
   const onSubmit = (data: FormValues) => {
+        // 입력값(년월일) 숫자 변환
     const y = parseInt(data.year || '', 10)
     const mo = parseInt(data.month || '', 10)
     const d = parseInt(data.day || '', 10)
+    // 필수값 검증
     if (isNaN(y) || isNaN(mo) || isNaN(d)) {
       alert('생년월일(년·월·일)을 정확히 입력해주세요.')
       return
     }
+
+    // 시분초는 빈칸이면 0으로
     const h = toNumberOrZero(data.hour)
     const mi = toNumberOrZero(data.minute)
     const s = toNumberOrZero(data.second)
+
+    // 범위 검증
     const validRange =
       mo >= 1 && mo <= 12 &&
       d >= 1 && d <= 31 &&
@@ -82,6 +90,8 @@ export default function AgeCalc() {
       alert('월(1~12), 일(1~31), 시(0~23), 분/초(0~59)를 확인해주세요.')
       return
     }
+
+    // 입력값을 dayjs 객체로 변환
     const dobStr = `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')} ` +
                    `${String(h).padStart(2, '0')}:${String(mi).padStart(2, '0')}:${String(s).padStart(2, '0')}`
     const dob = dayjs(dobStr, 'YYYY-MM-DD HH:mm:ss')
@@ -89,19 +99,25 @@ export default function AgeCalc() {
       alert('날짜/시간 형식이 올바르지 않습니다.')
       return
     }
+    // 올해 날짜 객체
     const now = dayjs()
+    // 한국 나이 계산 (올해-출생년도+1)
     const koreanAge = now.year() - dob.year() + 1
+    // 만 나이 계산 (생일 안지났으면 -1)
     let intlAge = now.year() - dob.year()
     const thisYearBirthday = dob.set('year', now.year())
     if (now.isBefore(thisYearBirthday)) {
       intlAge -= 1
     }
+    // 띠 계산
     const zodiac = getZodiac(dob.year(), dob.month() + 1, dob.date())
+    // 결과 날짜 포맷
     const formattedDOB = formatWithDay(dob)
+    // 결과 저장 및 결과 화면으로 전환
     setResult({ formattedDOB, koreanAge, intlAge, zodiac })
     setMode('result')
   }
-
+  // 폼과 결과 리셋
   const handleReset = () => {
     reset()
     setResult(null)
