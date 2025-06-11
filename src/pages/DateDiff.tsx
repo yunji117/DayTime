@@ -140,7 +140,7 @@ export default function DateDiff() {
               <input
                 type="text"
                 maxLength={2}
-                placeholder="MM"
+                placeholder="MM" 
                 {...register('startMonth', {
                   required: '월을 입력해주세요',
                   pattern: {
