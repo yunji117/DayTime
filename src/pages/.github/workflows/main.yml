@@ -1,0 +1,27 @@
+name: DayTime 자동화
+
+# push나 PR마다 자동 실행
+on: [push, pull_request] 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 내려받기
+        uses: actions/checkout@v4
+
+      - name: Node.js 18 세팅
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 의존성 설치
+        run: npm install
+
+      - name: 테스트 실행
+        run: npm test
+
+      # 만약 빌드만 하고 싶으면 아래 추가
+      - name: 빌드 실행
+        run: npm run build
